@@ -12,7 +12,8 @@ def query(querytext):
 def get_attributelist(row):
     attributes = ''
     for key, value in row.items():
-        attributes = attributes + f"{key}=\'{value}\' "
+        if key != 'notes':
+            attributes = attributes + f"{key}=\'{value}\' "
     return attributes.rstrip(' ')
 
 def get_taglist(task):
