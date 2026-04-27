@@ -1,14 +1,23 @@
+# Imports
 import sqlite3, html
 
+# Global variables
+dbconn = None
+
+# Look at main() towards the bottom of the file
+
+# Helper for making sqlite return dictionary rows
 def dict_factory(cursor, row):
     fields = [column[0] for column in cursor.description]
     return {key: value for key, value in zip(fields, row)}
 
+# Send a query to sqlite, and return all rows
 def query(querytext):
     dbcursor = dbconn.cursor()
     dbcursor.execute(querytext)
     return dbcursor.fetchall()
 
+# Convert row values to a list of attributes for XML
 def get_attributelist(row):
     attributes = ''
     for key, value in row.items():
@@ -16,6 +25,7 @@ def get_attributelist(row):
             attributes = attributes + f"{key}=\'{value}\' "
     return attributes.rstrip(' ')
 
+# Get tags for a task ID
 def get_taglist(task):
     output = query(f"SELECT * FROM TMTaskTag INNER JOIN TMTag ON TMTaskTag.tags = TMTag.uuid WHERE TMTaskTag.tasks='{task['uuid']}'")
     tags = ''
@@ -23,6 +33,7 @@ def get_taglist(task):
         tags = tags + '"' + row['title'] + '",'
     return tags.rstrip(',')
 
+# Get, and out, checklist items for a task
 def handle_checklist(task):
     output = query(f"SELECT * FROM TMChecklistItem WHERE task='{task['uuid']}' ORDER BY \"index\"")
     if len(output) == 0:
@@ -33,6 +44,7 @@ def handle_checklist(task):
         print(f"<item {attributes} />")
     print('</checklist>')
 
+# Output a heading
 def handle_heading(heading):
     attributes = get_attributelist(heading)
     tags = get_taglist(heading)
@@ -53,6 +65,7 @@ def handle_heading(heading):
             handle_heading(row)
     print('</heading>')
 
+# Output a project
 def handle_project(project):
     attributes = get_attributelist(project)
     tags = get_taglist(project)
@@ -71,6 +84,7 @@ def handle_project(project):
             handle_heading(row)
     print('</project>')
 
+# Output a task
 def handle_task(task):
     attributes = get_attributelist(task)
     tags = get_taglist(task)
@@ -80,7 +94,7 @@ def handle_task(task):
     handle_checklist(task)
     print('</task>')
 
-
+# Output an area
 def handle_area(area):
     attributes = get_attributelist(area)
     print(f"<area {attributes}>")
@@ -95,6 +109,7 @@ def handle_area(area):
             handle_heading(row)
     print('</area>')
 
+# Output the Things3 contents
 def handle_things():
     print('<things3>')
     output = query('SELECT * FROM TMArea ORDER BY "index"')
@@ -102,18 +117,15 @@ def handle_things():
         handle_area(row)
     print ('</things3>')
 
+def main():
+    # Set up database
+    database = "main.sqlite"
+    dbconn = sqlite3.connect(database)
+    dbconn.row_factory = dict_factory
 
-database = "main.sqlite"
+    handle_things()
 
-# Connecting to sqlite databse
-dbconn = sqlite3.connect(database)
-dbconn.row_factory = dict_factory
-
-handle_things()
-
-dbconn.commit()
-
-# Close the connection
-dbconn.close()
+    # Close up
+    dbconn.close()
 
 
