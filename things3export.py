@@ -4,7 +4,11 @@ import sqlite3, html
 # Global variables
 dbconn = None
 
-# Look at main() towards the bottom of the file
+# 3 = completed, 2 = cancelled
+filtertasks = "trashed=0 AND status != 3 AND status != 2"
+
+# Columns we ignore for tasks - notes are handled separately, the rest are BLOBs
+ignorecols = ('notes', 'cachedTags', 'rt1_recurrenceRule', 'experimental', 'repeater')
 
 # Helper for making sqlite return dictionary rows
 def dict_factory(cursor, row):
@@ -21,7 +25,9 @@ def query(querytext):
 def get_attributelist(row):
     attributes = ''
     for key, value in row.items():
-        if key != 'notes':
+        if not key in ignorecols:
+            if isinstance(value, str):
+                value = html.escape(value)
             attributes = attributes + f"{key}=\'{value}\' "
     return attributes.rstrip(' ')
 
@@ -54,7 +60,7 @@ def handle_heading(heading):
         # Headings don't have notes, but I don't want to assume anything
         print('<note>' + html.escape(heading['notes']) + '</note>')
     handle_checklist(heading)
-    output = query(f"SELECT * FROM TMTask WHERE trashed=0 AND heading='{heading['uuid']}' ORDER BY \"index\", \"type\"")
+    output = query(f"SELECT * FROM TMTask WHERE {filtertasks} AND heading='{heading['uuid']}' ORDER BY \"index\", \"type\"")
     for row in output:
         # Headings only contains tasks for now, but I don't want to assume anything
         if row['type'] == 0:
@@ -73,7 +79,7 @@ def handle_project(project):
     if len(project['notes']) > 0:
         print('<note>' + html.escape(project['notes']) + '</note>')
     handle_checklist(project)
-    output = query(f"SELECT * FROM TMTask WHERE trashed=0 AND project='{project['uuid']}' ORDER BY \"index\", \"type\"")
+    output = query(f"SELECT * FROM TMTask WHERE {filtertasks} AND project='{project['uuid']}' ORDER BY \"index\", \"type\"")
     for row in output:
         if row['type'] == 0:
             handle_task(row)
@@ -98,7 +104,7 @@ def handle_task(task):
 def handle_area(area):
     attributes = get_attributelist(area)
     print(f"<area {attributes}>")
-    output = query(f"SELECT * FROM TMTask WHERE trashed=0 AND area='{area['uuid']}' ORDER BY \"index\", \"type\"")
+    output = query(f"SELECT * FROM TMTask WHERE {filtertasks} AND area='{area['uuid']}' ORDER BY \"index\", \"type\"")
     for row in output:
         if row['type'] == 0:
             handle_task(row)
@@ -112,20 +118,31 @@ def handle_area(area):
 # Output the Things3 contents
 def handle_things():
     print('<things3>')
+
+    # Handle items without area
+    output = query(f"SELECT * FROM TMTask WHERE {filtertasks} AND area IS NULL AND project IS NULL AND heading IS NULL ORDER BY \"index\", \"type\"")
+    for row in output:
+        if row['type'] == 0:
+            handle_task(row)
+        if row['type'] == 1:
+            handle_project(row)
+        if row['type'] == 2:
+            # A heading with nowhere to go makes no sense, but I don't want to assume anything.
+            handle_heading(row)
+
+    # Handle areas
     output = query('SELECT * FROM TMArea ORDER BY "index"')
     for row in output:
         handle_area(row)
-    print ('</things3>')
 
-def main():
-    # Set up database
-    database = "main.sqlite"
-    dbconn = sqlite3.connect(database)
-    dbconn.row_factory = dict_factory
+    print('</things3>')
 
-    handle_things()
+# Set up database
+database = "main.sqlite"
+dbconn = sqlite3.connect(database)
+dbconn.row_factory = dict_factory
 
-    # Close up
-    dbconn.close()
+handle_things()
 
-
+# Close up
+dbconn.close()
