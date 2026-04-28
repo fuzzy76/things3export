@@ -26,6 +26,7 @@ Caveats:
 * Separate reading and writing, so multiple outputs can be supported
 * Handle nested tags
 * Dump cancelled or completed projects to an archive file instead of ignoring them
+* Compare with [things.sh](https://github.com/AlexanderWillner/things.sh) and update database assumptions
 
 ## Known bugs
 * The starttime and endtime Front matter for projects is wrong. It looks like Things 3 stores this as something else than timestamps?
