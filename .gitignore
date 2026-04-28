@@ -1,4 +1,7 @@
 main.sqlite
+main.sqlite-shm
+main.sqlite-wal
+export_noteplan3/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
