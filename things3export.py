@@ -179,7 +179,7 @@ def handle_area(area):
     # Handle items in area
     output = query(f"SELECT * FROM TMTask WHERE {filtertasks} AND area='{area['uuid']}' ORDER BY \"index\", \"type\"")
 
-    with open ("index.md", "w") as f:
+    with open (f"{area['title'].replace("/", " or ")}.md", "w") as f:
         f.write(area['title'] + "\n")
         # Only way I can think of tagging an area in NotePlan
         f.write(f"{taglist}\n")       
@@ -201,7 +201,7 @@ def handle_things():
     # Handle items without area
     output = query(f"SELECT * FROM TMTask WHERE {filtertasks} AND area IS NULL AND project IS NULL AND heading IS NULL ORDER BY \"index\", \"type\"")
 
-    with open ("index.md", "w") as f:
+    with open ("Main.md", "w") as f:
         for row in output:
             if row['type'] == 0:
                 handle_task(row, f)
