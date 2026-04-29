@@ -61,24 +61,24 @@ def handle_checklist(task, f):
     if len(output) == 0:
         return
     for row in output:
-        state = ""
+        type = "+ [ ]"
         if row['status'] == 2:
-            state = " [-]"
+            state = "+ [-]"
         elif row['status'] == 3:
-            state = " [x]"
-        f.write(f"+{state} {row['title']}")
+            state = "+ [x]"
+        f.write(f"{type} {row['title']}")
 
 # Output a task
 def handle_task(task, f):
 
     taglist = get_taglist(task)
 
-    tasktype = "*"
+    tasktype = "- [ ]"
     if task['start'] == 0:
         taglist = (taglist + " #inbox").lstrip(' ')
     elif task['start'] == 2:
         taglist = (taglist + " #someday").lstrip(' ')
-        tasktype = "-"
+        tasktype = "+ [ ]"
     if task['status'] == 2:
         tasktype = "- [-]"
     elif task['status'] == 3:
