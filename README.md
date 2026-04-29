@@ -10,17 +10,15 @@ Requirements: Python 3 (no dependencies)
 3. The directory `export_noteplan3` now contains your data!
 
 Caveats:
-1. Slashes in projects names are replaced with " or ".
-2. Spaces in tags are replaced with _.
-3. Repeating is not supported at all, but marked with a tag.
-4. Reminders is not supported, but left out.
-5. Deadlines is not supported in NotePlan.
-6. NotePlan date: If a task is marked as today in Things 3, it will be in NotePlan. If not i a task has a start date, that will be the date of a task. If it doesn't, but has a deadline, that will be the date of the task.
-7. Project properties are not inherited down to tasks. So dates and tags are just dumped in the document.
-8. Someday/maybe tasks are created as checklist items and tagged #someday.
-9. Someday/maybe, cancellations and such are not supported on project level.
-10. Cancelled and completed projects are not included for now.
-11. Nested tags are flattened
+- Slashes in folder and filenames (for areas and projects) are replaced with " or "
+- Spaces in tags are replaced with _
+- Repeating is not supported at all, but marked with #repeating_template
+- Reminders are not supported
+- Deadlines are not supported in NotePlan, so not really brought over
+- NotePlan date: If a task is marked as today in Things 3, it will be in NotePlan. If not, if a task has a start date that will be the date of a task. If not, if it has a deadline, that will be the date of the task.
+- Someday/maybe tasks are created as checklist items and tagged #someday
+- Status (someday/maybe, cancellations, etc) are not supported for projects in NotePlan. Cancelled and completed projects are ignored.
+- Nested tags are flattened
 
 ## TODO
 * Separate reading and writing, so multiple outputs can be supported
