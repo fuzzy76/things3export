@@ -167,8 +167,9 @@ def handle_project(project):
 
 # Output an area
 def handle_area(area):
-    os.mkdir(area['title'])
-    os.chdir(area['title'])
+    foldername = area['title'].replace("/", " or ")
+    os.mkdir(foldername)
+    os.chdir(foldername)
 
     output = query(f"SELECT * FROM TMTaskTag INNER JOIN TMTag ON TMTaskTag.tags = TMTag.uuid WHERE TMTaskTag.tasks='{area['uuid']}'")
     taglist = ''
