@@ -180,6 +180,7 @@ def handle_area(area):
     output = query(f"SELECT * FROM TMTask WHERE {filtertasks} AND area='{area['uuid']}' ORDER BY \"index\", \"type\"")
 
     with open ("index.md", "w") as f:
+        f.write(area['title'] + "\n")
         # Only way I can think of tagging an area in NotePlan
         f.write(f"{taglist}\n")       
         for row in output:
