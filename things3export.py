@@ -61,7 +61,12 @@ def handle_checklist(task, f):
     if len(output) == 0:
         return
     for row in output:
-        f.write(f"+ {row['title']}")
+        state = ""
+        if row['status'] == 2:
+            state = " [-]"
+        elif row['status'] == 3:
+            state = " [x]"
+        f.write(f"+{state} {row['title']}")
 
 # Output a task
 def handle_task(task, f):
