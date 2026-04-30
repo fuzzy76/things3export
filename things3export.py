@@ -62,7 +62,7 @@ def get_taglist(task):
         tags = tags + '#' + row['title'].replace(' ', '_') + ' '
     return tags.rstrip(' ')
 
-# Get, and out, checklist items for a task
+# Get, and output, checklist items
 def handle_checklist(task, f):
     output = query(f"SELECT * FROM TMChecklistItem WHERE task='{task['uuid']}' ORDER BY \"index\"")
     if len(output) == 0:
@@ -109,7 +109,7 @@ def handle_task(task, f):
     handle_checklist(task, f)
 
 # Output a heading
-def handle_heading(heading, f):
+def handle_heading(heading, f, amnesties=[]):
     # Things 3 might not support tags for headings, but we do :)
     taglist = get_taglist(heading)
     f.write(f"## {heading['title']}\n")
@@ -122,7 +122,12 @@ def handle_heading(heading, f):
     for row in output:
         # Headings only contains tasks for now, but I don't want to assume anything
         if row['type'] == 0:
-            handle_task(row, f)
+            # Only open tasks...
+            if row['status'] not in (2,3):
+                handle_task(row, f)
+            # ...or last 10 closed ones
+            elif row['uuid'] in amnesties:
+                handle_task(row, f)
         if row['type'] == 1:
             print("Projects under a heading is not supported - ignoring.", row)
         if row['type'] == 2:
@@ -163,7 +168,7 @@ def handle_project(project):
         if len(project['notes']) > 0:
             f.write(project['notes'] + '\n')
         handle_checklist(project, f)
-        # Get a list of the last 10 closed tasks in this project
+        # Get a list of the last 10 closed tasks in this project that are not repeating
         output = query(f"SELECT uuid FROM TMTask WHERE project='{project['uuid']}' AND status IN (2,3) AND rt1_repeatingTemplate IS NULL ORDER BY stopDate DESC LIMIT 10;")
         amnesties = onecol_dic_to_list(output)
         output = query(f"SELECT * FROM TMTask WHERE {filtertasks} AND project='{project['uuid']}' ORDER BY \"index\", \"type\"")
@@ -178,7 +183,7 @@ def handle_project(project):
             if row['type'] == 1:
                 print("Subprojects are not supported - ignoring.", row)
             if row['type'] == 2:
-                handle_heading(row, f)
+                handle_heading(row, f, amnesties)
 
 # Output an area
 def handle_area(area):
