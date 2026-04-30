@@ -1,5 +1,5 @@
 # things3export
-A script that connects to your local Things 3 sqlite database and dumps the contents in a structure of folders (one for each area) and markdown files (one for each project, one index for each area, and one index at top level) - modeled after NotePlan.
+A script that connects to your local Things 3 sqlite database and dumps the contents in a structure of folders (one for each area) and markdown files (one for each project, one for each area, and one at top level) - modeled after NotePlan.
 
 WARNING: This code does not escape stuff very well. Please only use it on a copy of your personal Things database. It's probably possible to craft a malicious database that could write elsewhere on your system. And verify the output before using it for anything important.
 
