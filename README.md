@@ -3,11 +3,10 @@ A script that connects to your local Things 3 sqlite database and dumps the cont
 
 WARNING: This code does not escape stuff very well. Please only use it on a copy of your personal Things database. It's probably possible to craft a malicious database that could write elsewhere on your system. And verify the output before using it for anything important.
 
-Requirements: Python 3 (no dependencies)
-
-Project state: It works well enough to move my 26.000 rows Things 3 database over to NotePlan 3 without causing me to loose all overview. This means that it has served its purpose for me, and I do not intend to work on it for my own sake. However, I'll happily accept pull request, and might even consider co-maintainers after you have showed trustworthy in some capacity.
+Project state: It works well enough to move my 26.000 rows Things 3 database over to NotePlan 3 without causing me to loose all overview. This means that it has served its purpose for me, and I do not intend to work on it for my own sake. However, I'll happily accept pull requests, and might even consider co-maintainers after you have shown trustworthy in some capacity.
 
 ## Usage
+Requirements: Python 3 (no dependencies)
 1. Find your database according to [this article](https://culturedcode.com/things/support/articles/2982272/) and **copy** it to the folder of this script.
 2. Run the script from terminal using `python3 things3export.py`
 3. The directory `export_noteplan3` now contains your data!
@@ -23,6 +22,7 @@ Project state: It works well enough to move my 26.000 rows Things 3 database ove
 - Status (someday/maybe, cancellations, etc) are not supported for projects in NotePlan. Cancelled and completed projects are ignored.
 - Closed (completed or cancelled) tasks outside projects are ignored. Inside a project you get the 10 last closed tasks that were not a repeating task. This is an attempt to find a good compromise for important tasks vs noise.
 - Nested tags are flattened.
+- The naming pattern `filename (1).md`, `filename (2).md`, etc is used where multiple similar files is output.
 
 ## TODO
 * Compare with [things.sh](https://github.com/AlexanderWillner/things.sh) and update database assumptions.
