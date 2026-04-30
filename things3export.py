@@ -14,7 +14,6 @@ def onecol_dic_to_list(result):
     out = []
     for a in result:
         out.append(list(a.values())[0])
-    print(out)
     return out
 
 # Helper for making sqlite return dictionary rows
@@ -165,7 +164,7 @@ def handle_project(project):
             f.write(project['notes'] + '\n')
         handle_checklist(project, f)
         # Get a list of the last 10 closed tasks in this project
-        output = query(f"SELECT uuid FROM TMTask WHERE project='{project['uuid']}' AND status IN (2,3) ORDER BY stopDate DESC LIMIT 10;")
+        output = query(f"SELECT uuid FROM TMTask WHERE project='{project['uuid']}' AND status IN (2,3) AND rt1_repeatingTemplate IS NULL ORDER BY stopDate DESC LIMIT 10;")
         amnesties = onecol_dic_to_list(output)
         output = query(f"SELECT * FROM TMTask WHERE {filtertasks} AND project='{project['uuid']}' ORDER BY \"index\", \"type\"")
         for row in output:
