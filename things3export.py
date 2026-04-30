@@ -9,6 +9,14 @@ exportdir = None
 
 filtertasks = "trashed=0"
 
+# Convert a query result containing one value for each row into a list
+def onecol_dic_to_list(result):
+    out = []
+    for a in result:
+        out.append(list(a.values())[0])
+    print(out)
+    return out
+
 # Helper for making sqlite return dictionary rows
 def dict_factory(cursor, row):
     fields = [column[0] for column in cursor.description]
@@ -156,10 +164,18 @@ def handle_project(project):
         if len(project['notes']) > 0:
             f.write(project['notes'] + '\n')
         handle_checklist(project, f)
+        # Get a list of the last 10 closed tasks in this project
+        output = query(f"SELECT uuid FROM TMTask WHERE project='{project['uuid']}' AND status IN (2,3) ORDER BY stopDate DESC LIMIT 10;")
+        amnesties = onecol_dic_to_list(output)
         output = query(f"SELECT * FROM TMTask WHERE {filtertasks} AND project='{project['uuid']}' ORDER BY \"index\", \"type\"")
         for row in output:
             if row['type'] == 0:
-                handle_task(row, f)
+                # Only open tasks...
+                if row['status'] not in (2,3):
+                    handle_task(row, f)
+                # ...or last 10 closed ones
+                elif row['uuid'] in amnesties:
+                    handle_task(row, f)
             if row['type'] == 1:
                 print("Subprojects are not supported - ignoring.", row)
             if row['type'] == 2:
@@ -177,7 +193,7 @@ def handle_area(area):
         taglist = taglist + '#' + row['title'].replace(' ', '_') + ' '
     taglist = taglist.rstrip(' ')
 
-    # Handle items in area
+    # Handle items without project
     output = query(f"SELECT * FROM TMTask WHERE {filtertasks} AND area='{area['uuid']}' ORDER BY \"index\", \"type\"")
 
     with open (f"{area['title'].replace("/", " or ")}.md", "w") as f:
@@ -186,7 +202,9 @@ def handle_area(area):
         f.write(f"{taglist}\n")       
         for row in output:
             if row['type'] == 0:
-                handle_task(row, f)
+                # Only output open tasks
+                if row['status'] not in (2, 3):
+                    handle_task(row, f)
             if row['type'] == 2:
                 # Areas don't really support headings yet, but the data structure does, so let's pretend
                 handle_heading(row, f)
@@ -205,7 +223,9 @@ def handle_things():
     with open ("Main.md", "w") as f:
         for row in output:
             if row['type'] == 0:
-                handle_task(row, f)
+                # Only output open tasks
+                if row['status'] not in (2, 3):
+                    handle_task(row, f)
             if row['type'] == 2:
                 print("Heading without area - ignoring.", row)
 
