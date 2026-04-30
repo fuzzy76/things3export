@@ -5,8 +5,9 @@ WARNING: This code does not escape stuff very well. Please only use it on a copy
 
 Requirements: Python 3 (no dependencies)
 
-## Usage
+Project state: It works well enough to move my 26.000 rows Things 3 database over to NotePlan 3 without causing me to loose all overview. This means that it has served its purpose for me, and I do not intend to work on it for my own sake. However, I'll happily accept pull request, and might even consider co-maintainers after you have showed trustworthy in some capacity.
 
+## Usage
 1. Find your database according to [this article](https://culturedcode.com/things/support/articles/2982272/) and **copy** it to the folder of this script.
 2. Run the script from terminal using `python3 things3export.py`
 3. The directory `export_noteplan3` now contains your data!
@@ -24,14 +25,7 @@ Requirements: Python 3 (no dependencies)
 - Nested tags are flattened.
 
 ## TODO
-* Separate reading and writing in the codepath, with an intermediate internal representation of Things 3 data in a dictionary of dictionaries (or objects?). This is sort of a requirement before supporting alternate output formats.
-* Handle nested tags.
-* Dump cancelled or completed projects to an archive file instead of ignoring them. Maybe only non-repeating ones?
 * Compare with [things.sh](https://github.com/AlexanderWillner/things.sh) and update database assumptions.
-* Add commandline flags for some of the behaviour?
-
-## Known bugs
-* The starttime and endtime Front matter for projects is wrong. It looks like Things 3 stores this as something else than timestamps?
 
 ## Documentation tidbits:
 
